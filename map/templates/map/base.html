@@ -1,0 +1,30 @@
+<!-- base.html -->
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Merriweather:wght@700&family=Open+Sans&display=swap">
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+</head>
+<body>
+  <!-- Navigation Bar -->
+  <nav class="navbar">
+    <ul class="navbar-list">
+        <li><a href="{% url 'map_view' %}">Path Finder</a></li>
+    </ul>
+  </nav>
+
+  <!-- Main Content Area -->
+  <main class="content">
+    {% block content %}
+    {% endblock content %}
+  </main>
+
+
+</body>
+</html>
