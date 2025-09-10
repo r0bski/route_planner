@@ -8,6 +8,8 @@
 <!-- The map fills the entire background -->
 <div id="map"></div>
 
+<!-- Reset button -->
+<button id="resetBtn">Reset</button>
 
 
 
@@ -23,7 +25,42 @@
     maxZoom: 19,
     attribution: '© OpenStreetMap contributors'
   }).addTo(map);
+
+  // 3. Array to store clicked coordinates
+  var clickedCoords = [];
+
+  // 4. Layer group to hold markers (so we can clear them easily)
+  var markersLayer = L.layerGroup().addTo(map);
+
+  // 5. Handle map clicks
+  map.on('click', function(e) {
+    var lat = e.latlng.lat;
+    var lng = e.latlng.lng;
+
+    // Store in array
+    clickedCoords.push([lat, lng]);
+
+    // Add marker to layer group
+    L.marker([lat, lng])
+      .bindPopup("Lat: " + lat.toFixed(5) + "<br>Lng: " + lng.toFixed(5))
+      .addTo(markersLayer)
+      .openPopup();
+
+    console.log("Stored coordinates:", clickedCoords);
+  });
+
+  // 6. Reset button click handler
+  document.getElementById('resetBtn').addEventListener('click', function() {
+    // Clear markers from map
+    markersLayer.clearLayers();
+
+    // Empty the coordinates array
+    clickedCoords = [];
+
+    console.log("Coordinates cleared:", clickedCoords);
+  });
 </script>
+
 
 
 
