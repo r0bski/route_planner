@@ -3,4 +3,4 @@ Build and save routes for all your walking, running and cycling needs. Uses crim
 
 python manage.py runserver
 
--  OSRM demo server, GraphHopper API, Mapbox Directions API, or OpenRouteService
+- GraphHopper API, OpenRouteService

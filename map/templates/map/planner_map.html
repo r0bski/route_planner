@@ -8,6 +8,9 @@
 <!-- The map fills the entire background -->
 <div id="map"></div>
 
+<!-- Build button -->
+<button id="buildRouteBtn">Build Route</button>
+
 <!-- Reset button -->
 <button id="resetBtn">Reset</button>
 
@@ -26,19 +29,20 @@
     attribution: '© OpenStreetMap contributors'
   }).addTo(map);
 
-  // 3. Array to store clicked coordinates
+  // Array to store clicked coordinates
   var clickedCoords = [];
 
-  // 4. Layer group to hold markers (so we can clear them easily)
+  // Layer groups
   var markersLayer = L.layerGroup().addTo(map);
+  var routeLayer = L.layerGroup().addTo(map);
 
-  // 5. Handle map clicks
+  // Handle map clicks
   map.on('click', function(e) {
     var lat = e.latlng.lat;
     var lng = e.latlng.lng;
 
-    // Store in array
-    clickedCoords.push([lat, lng]);
+    //  ORS expects [lon, lat]
+    clickedCoords.push([lng, lat]);
 
     // Add marker to layer group
     L.marker([lat, lng])
@@ -49,16 +53,48 @@
     console.log("Stored coordinates:", clickedCoords);
   });
 
-  // 6. Reset button click handler
-  document.getElementById('resetBtn').addEventListener('click', function() {
-    // Clear markers from map
-    markersLayer.clearLayers();
+  //Build Route button
+  document.getElementById('buildRouteBtn').addEventListener('click', function() {
+    let pointCap = 20;
+    if (clickedCoords.length < 2) {
+      alert("Select at least two points to build a route.");
+      return;
+    }
+    if (clickedCoords.length > pointCap){
+        alert("Select less than "+pointCap+" points to build a route.");
+      return;
+    }
 
-    // Empty the coordinates array
-    clickedCoords = [];
+    fetch("{% url 'get_route' %}", {
+      method: "POST",
+      headers: {
+        "X-CSRFToken": "{{ csrf_token }}",
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ coords: clickedCoords })
+    })
+    .then(res => res.json())
+    .then(data => {
+      routeLayer.clearLayers();
 
-    console.log("Coordinates cleared:", clickedCoords);
+      // Convert [lon, lat] to [lat, lon] for Leaflet
+      var coords = data.features[0].geometry.coordinates.map(c => [c[1], c[0]]);
+      L.polyline(coords, {color: 'blue', weight: 4}).addTo(routeLayer);
+
+      console.log("Route data:", data);
+    })
+    .catch(err => console.error(err));
   });
+
+
+  // Reset button click handler
+  document.getElementById('resetBtn').addEventListener('click', function() {
+    markersLayer.clearLayers();
+    routeLayer.clearLayers();
+    clickedCoords = [];
+    console.log("Cleared all points and routes");
+  });
+
 </script>
 
 
